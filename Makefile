@@ -34,7 +34,7 @@ deps: ## get service pkg + test deps
 	@echo "[deps] getting go deps"
 	go get -v -t ./...
 
-lambda: lint ## build the lambda binary for todo
+lambda: lint ## build the lambda binary
 	@echo "[lambda] building go binary"
 	@GOOS=linux go build \
 		-ldflags "-s -w \
