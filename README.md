@@ -9,7 +9,9 @@ proxge
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache 2.0-blue.svg?style=flat-square"></a>
 </p>
 
-GE passthrough for google spreadsheets
+GE passthrough for google spreadsheets.
+
+Caches ge prices from rsbuddy and failover on osrs ge page to redis.
 
 Changelog
 ---------
