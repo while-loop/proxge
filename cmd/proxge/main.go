@@ -55,8 +55,12 @@ func main() {
 		ge.NewRsBuddyGe(c),
 	}
 
-	log.Printf("Using %T as cache\n", c)
-	log.Printf("Using %v apis\n", c)
+	log.Printf("Using cache:")
+	log.Printf("\t%T", c)
+	log.Printf("Using apis:")
+	for _, a := range apis {
+		log.Printf("\t%s", a.Name())
+	}
 
 	router := mux.NewRouter()
 

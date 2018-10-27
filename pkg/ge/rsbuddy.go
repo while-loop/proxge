@@ -76,3 +76,7 @@ func (ge *rsBuddyGe) PriceById(id int) (int, error) {
 
 	return item.OverallAverage, nil
 }
+
+func (ge *rsBuddyGe) Name() string {
+	return "rsbuddyge"
+}

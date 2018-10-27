@@ -10,6 +10,7 @@ type osrsGe struct {
 	client *http.Client
 }
 
+
 func NewOsrsGe() proxge.GEApi {
 	return &osrsGe{
 		client: &http.Client{Timeout: 5 * time.Second},
@@ -18,4 +19,8 @@ func NewOsrsGe() proxge.GEApi {
 
 func (ge *osrsGe) PriceById(id int) (int, error) {
 	panic("implement me")
+}
+
+func (ge *osrsGe) Name() string {
+	return "osrsge"
 }
