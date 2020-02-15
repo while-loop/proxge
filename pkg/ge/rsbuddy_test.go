@@ -8,7 +8,7 @@ import (
 
 func TestCannonBall(t *testing.T) {
 	c := cache.NewMemCache()
-	rsbuddy := NewRsBuddyGe(c)
+	rsbuddy := NewRsBuddyGe(c).(*rsBuddyGe)
 
 	price, err := rsbuddy.PriceById(2)
 	assert.NoError(t, err)

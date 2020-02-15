@@ -45,7 +45,7 @@ lambda: lint ## build the lambda binary
 	@zip -j -r deployment.zip deploy/*
 
 lambda-deploy: lambda
-	aws lambda update-function-code \
+	aws --profile default lambda update-function-code \
 	--function-name proxgeFunction \
 	--zip-file fileb://./deployment.zip
 

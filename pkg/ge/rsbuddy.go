@@ -10,8 +10,9 @@ import (
 	"time"
 )
 
-const summaryUrl = `https://storage.googleapis.com/osbuddy-exchange/summary.json`
+const summaryUrl = `https://rsbuddy.com/exchange/summary.json`
 
+var _ proxge.GEApi = &rsBuddyGe{}
 type rsBuddyGe struct {
 	client    *http.Client
 	cache     proxge.GECache
