@@ -1,6 +1,6 @@
 # service specific vars
 SERVICE     := proxge
-VERSION     := 0.0.7
+VERSION     := 0.0.8
 
 TARGET      := ${SERVICE}
 COMMIT      := $(shell git rev-parse --short HEAD)
