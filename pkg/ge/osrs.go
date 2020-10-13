@@ -5,40 +5,18 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/while-loop/proxge/pkg"
+	"math"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 )
 
 type GEResp struct {
 	Item struct {
-		Icon        string `json:"icon"`
-		IconLarge   string `json:"icon_large"`
-		ID          int    `json:"id"`
-		Type        string `json:"type"`
-		TypeIcon    string `json:"typeIcon"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Current     struct {
-			Trend string `json:"trend"`
-			Price int    `json:"price"`
-		} `json:"current"`
-		Today struct {
-			Trend string `json:"trend"`
-			Price string `json:"price"`
-		} `json:"today"`
-		Members string `json:"members"`
-		Day30   struct {
-			Trend  string `json:"trend"`
-			Change string `json:"change"`
-		} `json:"day30"`
-		Day90 struct {
-			Trend  string `json:"trend"`
-			Change string `json:"change"`
-		} `json:"day90"`
-		Day180 struct {
-			Trend  string `json:"trend"`
-			Change string `json:"change"`
-		} `json:"day180"`
+		ID      int                    `json:"id"`
+		Name    string                 `json:"name"`
+		Current map[string]interface{} `json:"current"`
 	} `json:"item"`
 }
 
@@ -68,13 +46,47 @@ func (ge *osrsGe) PriceById(id int) (int, error) {
 		return 0, errors.Wrap(err, "osrs")
 	}
 
-	if data.Item.Current.Price <= 0 {
+	priceStr, ok := data.Item.Current["price"]
+	if !ok || priceStr == "" {
 		return 0, fmt.Errorf("no price given for item %d %s", data.Item.ID, data.Item.Name)
 	}
 
-	return data.Item.Current.Price, nil
+	price := 0
+	switch priceStr.(type) {
+	case float64:
+		price = int(priceStr.(float64))
+	case string:
+		price = unhumanizeNumber(priceStr.(string))
+	default:
+
+	}
+
+	return price, nil
 }
 
 func (ge *osrsGe) Name() string {
 	return "osrsge"
+}
+
+func unhumanizeNumber(num string) int {
+	num = strings.ToLower(num)
+	factor := 1.0
+	if strings.Contains(num, "k") {
+		factor = 1000
+	} else if strings.Contains(num, "m") {
+		factor = 1000000
+	} else if strings.Contains(num, "b") {
+		factor = 1000000000
+	}
+
+	num = strings.TrimRight(num, "kmb")
+	numFloat, err := strconv.ParseFloat(num, 64)
+	if err != nil {
+		return 0
+	}
+
+	numFloat = numFloat * factor
+	numFloat = math.Round(numFloat)
+
+	return int(numFloat)
 }
