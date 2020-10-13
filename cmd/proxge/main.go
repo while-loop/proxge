@@ -44,17 +44,19 @@ func main() {
 
 	c := cache.NewMemCache()
 	if config.RedisAddr != "" {
-		c = cache.NewRedisCache(cache.NewRedisClient(&redis.Options{
+		c = cache.NewRedisCache(&redis.Options{
 			Addr:     config.RedisAddr,
 			DB:       config.RedisDB,
 			Password: config.RedisPass,
-		}), config.Exp)
+		}, config.Exp)
 	}
 
 	apis := []proxge.GEApi{
-		ge.NewRsBuddyGe(c),
+		ge.NewOsrsGe(),
 	}
 
+	log.Printf("Using conf:")
+	log.Printf("\t%v", config)
 	log.Printf("Using cache:")
 	log.Printf("\t%T", c)
 	log.Printf("Using apis:")

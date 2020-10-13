@@ -28,10 +28,10 @@ func TestRedis(t *testing.T) {
 	rClient := redis.NewClient(o)
 
 	assert.NoError(t, rClient.Ping().Err())
-	r := NewRedisCache(rClient, config.Exp)
+	r := NewRedisCache(o, config.Exp)
 
 	assert.NoError(t, r.Set(-3, 300))
-	p, err := r.Get(-3)
+	p, _, err := r.Get(-3)
 	assert.NoError(t, err)
 	assert.Equal(t, 300, p)
 }

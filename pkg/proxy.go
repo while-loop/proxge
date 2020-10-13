@@ -9,25 +9,23 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var ErrDoesNotExist = errors.New("item does not exist")
 
 type ProxGe struct {
-	router *mux.Router
 	cache  GECache
 	apis   []GEApi
 }
 
 func New(cache GECache, router *mux.Router, api ...GEApi) *ProxGe {
 	p := &ProxGe{
-		router: router,
 		cache:  cache,
 		apis:   api,
 	}
 
-	apiRouter := router.PathPrefix("/api").Subrouter()
-	apiRouter.HandleFunc("/id/{id}", asJson(p.getById))
+	router.HandleFunc("/id/{id}", asJson(p.GetById))
 	return p
 }
 
@@ -36,7 +34,7 @@ type priceResponse struct {
 	Price int `json:"price"`
 }
 
-func (p *ProxGe) getById(w http.ResponseWriter, r *http.Request) {
+func (p *ProxGe) GetById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	strId, ok := vars["id"]
 	if !ok {
@@ -51,7 +49,7 @@ func (p *ProxGe) getById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	price, err := p.cache.Get(id)
+	price, ttl, err := p.cache.Get(id)
 	if err != nil {
 		price, err = p.getPrice(id)
 		if err != nil {
@@ -64,7 +62,14 @@ func (p *ProxGe) getById(w http.ResponseWriter, r *http.Request) {
 			log.Printf("failed to set cache for %d %d: %v", id, price, err)
 		}
 	}
+	now := time.Now().UTC()
+	cacheSince := now.Add(ttl-p.cache.GetTTL()).Format(http.TimeFormat)
+	cacheUntil := now.Add(ttl).Format(http.TimeFormat)
 
+	w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%d, public", int(ttl.Seconds())))
+	w.Header().Set("Last-Modified", cacheSince)
+	w.Header().Set("Expires", cacheUntil)
+	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(priceResponse{Price: price, ID: id}); err != nil {
 		log.Printf("failed to send price response for %d: %v\n", id, err)
 	}
