@@ -35,7 +35,7 @@ func NewOsrsGe() proxge.GEApi {
 func (ge *osrsGe) PriceById(id int) (int, error) {
 	resp, err := ge.client.Get(fmt.Sprintf(baseUrl, id))
 	if err != nil {
-		return 0, errors.Wrap(err, "osrs")
+		return -1, errors.Wrap(err, "osrs")
 	}
 
 	defer resp.Body.Close()
@@ -43,12 +43,12 @@ func (ge *osrsGe) PriceById(id int) (int, error) {
 	var data *GEResp
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
-		return 0, errors.Wrap(err, "osrs")
+		return -1, errors.Wrap(err, "osrs")
 	}
 
 	priceStr, ok := data.Item.Current["price"]
 	if !ok || priceStr == "" {
-		return 0, fmt.Errorf("no price given for item %d %s", data.Item.ID, data.Item.Name)
+		return -1, fmt.Errorf("no price given for item %d %s", data.Item.ID, data.Item.Name)
 	}
 
 	price := 0
@@ -58,7 +58,10 @@ func (ge *osrsGe) PriceById(id int) (int, error) {
 	case string:
 		price = unhumanizeNumber(priceStr.(string))
 	default:
+	}
 
+	if price <= 0 {
+		return -1, fmt.Errorf("no price given for item %d %s", data.Item.ID, data.Item.Name)
 	}
 
 	return price, nil
@@ -69,7 +72,7 @@ func (ge *osrsGe) Name() string {
 }
 
 func unhumanizeNumber(num string) int {
-	num = strings.ToLower(num)
+	num = strings.ReplaceAll(strings.ToLower(num), ",", "")
 	factor := 1.0
 	if strings.Contains(num, "k") {
 		factor = 1000
