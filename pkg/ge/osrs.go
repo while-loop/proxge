@@ -82,7 +82,7 @@ func unhumanizeNumber(num string) int {
 		factor = 1000000000
 	}
 
-	num = strings.TrimRight(num, "kmb")
+	num = strings.TrimRight(strings.TrimSpace(num), "kmb")
 	numFloat, err := strconv.ParseFloat(num, 64)
 	if err != nil {
 		return 0

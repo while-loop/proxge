@@ -13,10 +13,11 @@ func Test_osrsGe_PriceById(t *testing.T) {
 		want    int
 		wantErr bool
 	}{
-		//{"cannonball", 2, 1000, false},
-		//{"negative id", -1, 0, true},
-		//{"bgs unhumanize price", 11804, 30000000, false},
+		{"cannonball", 2, 1000, false},
+		{"negative id", -1, 0, true},
+		{"bgs unhumanize price", 11804, 30000000, false},
 		{"sara brew", 6685, 20000, false},
+		{"harmonised orb", 24511, 5000000000, false},
 	}
 	ge := &osrsGe{
 		client: &http.Client{
